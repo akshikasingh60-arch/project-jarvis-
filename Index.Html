@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S.</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #050d18;
+  color: #00d9ff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 25px 15px;
+}
+h1 {
+  margin-top: 35px;
+  font-size: 32px;
+  letter-spacing: 5px;
+  text-shadow: 0 0 15px #00d9ff;
+}
+.circle {
+  width: 170px;
+  height: 170px;
+  border: 4px solid #00d9ff;
+  border-radius: 50%;
+  margin: 35px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 55px;
+  box-shadow: 0 0 25px #00d9ff;
+}
+.status { color: #8beeff; margin: 20px; }
+input {
+  width: 90%;
+  padding: 15px;
+  border: 1px solid #00d9ff;
+  border-radius: 10px;
+  background: #101e30;
+  color: white;
+  font-size: 16px;
+}
+button {
+  padding: 13px 22px;
+  margin: 10px 5px;
+  border: none;
+  border-radius: 8px;
+  background: #00bde8;
+  color: #00101b;
+  font-weight: bold;
+  font-size: 15px;
+}
+#reply {
+  margin: 25px auto;
+  padding: 18px;
+  width: 90%;
+  min-height: 65px;
+  background: #101e30;
+  border: 1px solid #007d9e;
+  border-radius: 10px;
+  color: white;
+}
+</style>
+</head>
+
+<body>
+
+<h1>J.A.R.V.I.S.</h1>
+<p>JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+
+<div class="circle">◉</div>
+
+<div class="status" id="status">SYSTEM ONLINE</div>
+
+<input id="command" placeholder="Type your command...">
+
+<br>
+<button onclick="runCommand()">SEND COMMAND</button>
+<button onclick="listen()">🎤 SPEAK</button>
+
+<div id="reply">Hello Sir. JARVIS is ready.</div>
+
+<script>
+function speak(text) {
+  speechSynthesis.cancel();
+
+  const message = new SpeechSynthesisUtterance(text);
+  message.lang = "hi-IN";
+  message.rate = 0.9;
+  message.pitch = 1;
+
+  const voices = speechSynthesis.getVoices();
+  const hindiVoice = voices.find(v => v.lang.toLowerCase().startsWith("hi"));
+
+  if (hindiVoice) message.voice = hindiVoice;
+
+  speechSynthesis.speak(message);
+}
+
+function showReply(text) {
+  document.getElementById("reply").innerText = text;
+  speak(text);
+}
+
+function runCommand() {
+  const input = document.getElementById("command");
+  const cmd = input.value.toLowerCase().trim();
+
+  if (!cmd) {
+    showReply("Sir, please give me a command.");
+    return;
+  }
+
+  if (cmd.includes("hello") || cmd.includes("नमस्ते") || cmd.includes("hi")) {
+    showReply("नमस्ते सर! JARVIS आपकी सेवा में तैयार है।");
+  }
+  else if (cmd.includes("your name") || cmd.includes("naam")) {
+    showReply("मेरा नाम JARVIS है। मैं आपका डिजिटल असिस्टेंट हूँ।");
+  }
+  else if (cmd.includes("time") || cmd.includes("समय")) {
+    showReply("सर, अभी समय है " + new Date().toLocaleTimeString("en-IN"));
+  }
+  else if (cmd.includes("date") || cmd.includes("तारीख")) {
+    showReply("आज की तारीख है " + new Date().toLocaleDateString("en-IN"));
+  }
+  else if (cmd.includes("youtube")) {
+    showReply("सर, YouTube खोल रहा हूँ।");
+    window.open("https://www.youtube.com", "_blank");
+  }
+  else if (cmd.includes("study") || cmd.includes("पढ़ाई")) {
+    showReply("सर, पढ़ाई शुरू करने का समय हो गया है। आपका लक्ष्य 95 प्रतिशत है!");
+  }
+  else if (cmd.includes("how are you") || cmd.includes("kaise ho")) {
+    showReply("मैं बिल्कुल ठीक हूँ सर। सभी सिस्टम काम कर रहे हैं।");
+  }
+  else if (cmd.includes("thank")) {
+    showReply("आपका स्वागत है सर।");
+  }
+  else {
+    showReply("माफ कीजिए सर, मैं यह कमांड अभी समझ नहीं पाया।");
+  }
+
+  input.value = "";
+}
+
+function listen() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) {
+    alert("Speech recognition is not supported");
+    return;
+  }
+
+  const rec = new SR();
+  rec.lang = "hi-IN";
+  rec.interimResults = false;
+
+  rec.onstart = () => {
+    document.getElementById("status").innerText = "LISTENING...";
+  };
+
+  rec.onresult = (event) => {
+    document.getElementById("command").value =
+      event.results[0][0].transcript;
+    runCommand();
+  };
+
+  rec.onerror = (event) => {
+    alert("Voice Error: " + event.error);
+  };
+
+  rec.onend = () => {
+    document.getElementById("status").innerText = "SYSTEM ONLINE";
+  };
+
+  rec.start();
+}
+</script>
+
+</body>
+</html>
+
